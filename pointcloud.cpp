@@ -1,0 +1,123 @@
+// g++ -std=c++11 -o pointcloud pointcloud.cpp -lrealsense2 `pkg-config --cflags --libs opencv4` -lGL -lGLU -lglfw
+
+#include <librealsense2/rs.hpp>   // Include RealSense Cross Platform API
+#include "example.hpp"            // Include short list of convenience functions for rendering
+#include <algorithm>              // For std::min, std::max
+
+// Struct for managing rotation of pointcloud view
+struct state {
+    double yaw, pitch, last_x, last_y;
+    bool ml;
+    float offset_x, offset_y;
+    texture tex;
+};
+
+// Helper functions
+void register_glfw_callbacks(window& app, state& app_state);
+void draw_pointcloud(window& app, state& app_state, rs2::points& points);
+
+int main(int argc, char * argv[]) try
+{
+    // Create a simple OpenGL window for rendering:
+    window app(1280, 720, "Capstone RoV Point Cloud Capture");
+    // Construct an object to manage view state
+    state app_state = { 0, 0, 0, 0, false, 0, 0 };
+    // register callbacks to allow manipulation of the pointcloud
+    register_glfw_callbacks(app, app_state);
+
+    using namespace rs2;
+    // Declare pointcloud object, for calculating pointclouds and texture mappings
+    pointcloud pc;
+    // We want the points object to be persistent so we can display the last cloud when a frame drops
+    points points;
+
+    // Declare RealSense pipeline, encapsulating the actual device and sensors
+    pipeline pipe;
+    // Start streaming with default recommended configuration
+    pipe.start();
+
+    while (app) {
+        // Wait for the next set of frames from the camera
+        auto frames = pipe.wait_for_frames();
+
+        auto depth = frames.get_depth_frame();
+        // Generate the pointcloud and texture mappings
+        points = pc.calculate(depth);
+
+        auto color = frames.get_color_frame();
+        // Tell pointcloud object to map to this color frame
+        pc.map_to(color);
+
+        // Upload the color frame to OpenGL
+        app_state.tex.upload(color);
+
+        draw_pointcloud(app, app_state, points);
+    }
+
+    return EXIT_SUCCESS;
+}
+catch (const rs2::error & e)
+{
+    std::cerr << "RealSense error calling " << e.get_failed_function() << "(" << e.get_failed_args() << "):\n    " << e.what() << std::endl;
+    return EXIT_FAILURE;
+}
+catch (const std::exception& e)
+{
+    std::cerr << e.what() << std::endl;
+    return EXIT_FAILURE;
+}
+
+void register_glfw_callbacks(window& app, state& app_state)
+{
+    // Implement glfw callbacks for mouse interactions
+}
+
+void draw_pointcloud(window& app, state& app_state, rs2::points& points)
+{
+    // Setup OpenGL viewpoint
+    glPopMatrix();
+    glPushAttrib(GL_ALL_ATTRIB_BITS);
+
+    // Set perspective projection
+    float width = app.width(), height = app.height();
+    glClear(GL_DEPTH_BUFFER_BIT);
+    glMatrixMode(GL_PROJECTION);
+    glLoadIdentity();
+    gluPerspective(60, width/height, 0.01f, 10.0f);
+
+    // Set camera view
+    glMatrixMode(GL_MODELVIEW);
+    glLoadIdentity();
+    gluLookAt(0,0,0, 0,0,1, 0,-1,0);
+
+    // Rotate view
+    glTranslatef(app_state.offset_x, app_state.offset_y, 0);
+    glRotatef(app_state.pitch, 1, 0, 0);
+    glRotatef(app_state.yaw, 0, 1, 0);
+    glTranslatef(0, 0, -0.5f);
+
+    // Draw pointcloud
+    glEnable(GL_DEPTH_TEST);
+    glEnable(GL_TEXTURE_2D);
+    glBindTexture(GL_TEXTURE_2D, app_state.tex.get_gl_handle());
+    float tex_border_color[] = { 0.0f, 0.0f, 0.0f, 0.0f };
+    glTexParameterfv(GL_TEXTURE_2D, GL_TEXTURE_BORDER_COLOR, tex_border_color);
+    glBegin(GL_POINTS);
+
+    // Iterate over each point in the pointcloud
+    auto vertices = points.get_vertices();              // get vertices
+    auto tex_coords = points.get_texture_coordinates(); // and texture coordinates
+    for (int i = 0; i < points.size(); ++i)
+    {
+        if (vertices[i].z)
+        {
+            // Upload the point and texture coordinates only for points we have depth data for
+            glVertex3f(vertices[i].x, vertices[i].y, vertices[i].z);
+            glTexCoord2f(tex_coords[i].u, tex_coords[i].v);
+        }
+    }
+
+    glEnd();
+    glPopMatrix();
+    glPopAttrib();
+}

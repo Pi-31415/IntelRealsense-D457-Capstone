@@ -1,0 +1,4 @@
+/home/pi/Documents/GitHub/IntelRealsense-D457-Capstone/build-RealSenseClient-Desktop-Debug/CMakeFiles/rebuild_cache.dir
+/home/pi/Documents/GitHub/IntelRealsense-D457-Capstone/build-RealSenseClient-Desktop-Debug/CMakeFiles/edit_cache.dir
+/home/pi/Documents/GitHub/IntelRealsense-D457-Capstone/build-RealSenseClient-Desktop-Debug/CMakeFiles/RealSenseClient.dir
+/home/pi/Documents/GitHub/IntelRealsense-D457-Capstone/build-RealSenseClient-Desktop-Debug/CMakeFiles/RealSenseClient_autogen.dir

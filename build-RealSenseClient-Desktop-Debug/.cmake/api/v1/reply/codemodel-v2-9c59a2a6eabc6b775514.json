@@ -1,0 +1,68 @@
+{
+	"configurations" : 
+	[
+		{
+			"directories" : 
+			[
+				{
+					"build" : ".",
+					"minimumCMakeVersion" : 
+					{
+						"string" : "3.5"
+					},
+					"projectIndex" : 0,
+					"source" : ".",
+					"targetIndexes" : 
+					[
+						0,
+						1
+					]
+				}
+			],
+			"name" : "Debug",
+			"projects" : 
+			[
+				{
+					"directoryIndexes" : 
+					[
+						0
+					],
+					"name" : "RealSenseClient",
+					"targetIndexes" : 
+					[
+						0,
+						1
+					]
+				}
+			],
+			"targets" : 
+			[
+				{
+					"directoryIndex" : 0,
+					"id" : "RealSenseClient::@6890427a1f51a3e7e1df",
+					"jsonFile" : "target-RealSenseClient-Debug-98661816c21bfa5e4360.json",
+					"name" : "RealSenseClient",
+					"projectIndex" : 0
+				},
+				{
+					"directoryIndex" : 0,
+					"id" : "RealSenseClient_autogen::@6890427a1f51a3e7e1df",
+					"jsonFile" : "target-RealSenseClient_autogen-Debug-92ff536be05c81479712.json",
+					"name" : "RealSenseClient_autogen",
+					"projectIndex" : 0
+				}
+			]
+		}
+	],
+	"kind" : "codemodel",
+	"paths" : 
+	{
+		"build" : "/home/pi/Documents/GitHub/IntelRealsense-D457-Capstone/build-RealSenseClient-Desktop-Debug",
+		"source" : "/home/pi/Documents/GitHub/IntelRealsense-D457-Capstone/RealSenseClient"
+	},
+	"version" : 
+	{
+		"major" : 2,
+		"minor" : 0
+	}
+}

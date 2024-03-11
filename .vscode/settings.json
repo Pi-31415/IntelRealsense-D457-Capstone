@@ -1,0 +1,11 @@
+{
+    "files.associations": {
+        "any": "cpp",
+        "optional": "cpp",
+        "variant": "cpp",
+        "algorithm": "cpp",
+        "iostream": "cpp",
+        "fstream": "cpp",
+        "workingpointcloud": "c"
+    }
+}
